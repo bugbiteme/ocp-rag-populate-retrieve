@@ -1,9 +1,8 @@
-import chromadb
+from chromadb.api.client import Client
 from chromadb.config import Settings
 
 def load_to_chroma(chunks):
-    client = chromadb.Client(Settings(
-        chroma_api_impl="rest",
+    client = Client(Settings(
         chroma_server_host="chroma.player1.svc.cluster.local",
         chroma_server_http_port=8080,
     ))
