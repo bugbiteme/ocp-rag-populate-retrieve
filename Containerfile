@@ -12,7 +12,7 @@ RUN dnf install -y gcc make wget tar sqlite-devel python3-devel \
     && wget https://www.sqlite.org/2025/sqlite-autoconf-3500300.tar.gz \
     && tar -xzf sqlite-autoconf-3500300.tar.gz \
     && cd sqlite-autoconf-3500300 \
-    && ./configure --prefix=/usr/local \
+    && ./configure --prefix=/usr/local CFLAGS="-DSQLITE_ENABLE_FTS5" \
     && make && make install \
     && ln -sf /usr/local/lib/libsqlite3.so.0 /usr/lib64/libsqlite3.so.0 \
     && cd .. && rm -rf sqlite-autoconf-3500300*
