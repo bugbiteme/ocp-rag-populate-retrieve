@@ -23,6 +23,9 @@ ENV LD_LIBRARY_PATH=/usr/local/lib
 # Copy application code
 COPY . /app
 
+RUN pip uninstall -y chromadb chroma-hnswlib || true && \
+    pip install --no-cache-dir chromadb==0.6.3
+
 # Install Python packages (ensure build dependencies for chromadb)
 RUN pip install --upgrade pip setuptools wheel build && \
     pip install --no-cache-dir -r requirements.txt
