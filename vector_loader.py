@@ -6,6 +6,7 @@ def load_to_chroma(chunks):
         chroma_api_impl="chromadb.api.fastapi.FastAPIClient",
         chroma_server_host="chroma.player1.svc.cluster.local",
         chroma_server_http_port=8080,
+        environment="default" 
     ))
 
     collection = client.get_or_create_collection(name="quantumpulse_chunks")
