@@ -38,6 +38,10 @@ def load_chunks_to_vector_db():
         return JSONResponse(status_code=404, content={"error": "Markdown file not found or empty"})
 
     try:
+        # Defer chromadb import to avoid SQLite check on startup
+        from chromadb.client import HttpClient
+        from chromadb.config import Settings
+
         client = HttpClient(Settings(
             chroma_api_impl="rest",
             chroma_server_host="chroma.player1.svc.cluster.local",
