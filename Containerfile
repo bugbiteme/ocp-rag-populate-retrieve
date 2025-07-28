@@ -7,7 +7,7 @@ USER root
 # Set working directory
 WORKDIR /app
 
-# Install system-level build dependencies and compile SQLite 3.50.3
+# Install system-level build dependencies and compile SQLite 3.50.3 with FTS5
 RUN dnf install -y gcc make wget tar sqlite-devel python3-devel \
     && wget https://www.sqlite.org/2025/sqlite-autoconf-3500300.tar.gz \
     && tar -xzf sqlite-autoconf-3500300.tar.gz \
@@ -23,14 +23,14 @@ ENV LD_LIBRARY_PATH=/usr/local/lib
 # Copy application code
 COPY . /app
 
-RUN pip uninstall -y chromadb chroma-hnswlib || true && \
-    pip install --no-cache-dir chromadb==0.6.3
-
-# Install Python packages (ensure build dependencies for chromadb)
+# Install Python build tools and force clean Chroma install
 RUN pip install --upgrade pip setuptools wheel build && \
+    pip uninstall -y chromadb chroma-hnswlib || true && \
+    rm -rf /opt/app-root/lib64/python3.11/site-packages/chromadb* && \
+    pip install --no-cache-dir chromadb==0.6.3 && \
     pip install --no-cache-dir -r requirements.txt
 
-# (Optional) Debug: Confirm chromadb was installed
+# Debug: Confirm correct Chroma version
 RUN python3 -c "import chromadb; print('ChromaDB version:', chromadb.__version__)"
 
 # Switch back to non-root user for OpenShift
