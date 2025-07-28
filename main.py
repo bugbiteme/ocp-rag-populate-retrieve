@@ -2,8 +2,6 @@ from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 import re
 import os
-from chromadb.client import HttpClient
-from chromadb.config import Settings
 
 app = FastAPI()
 
@@ -31,6 +29,7 @@ def get_chunks_count():
 
 @app.get("/api/v1/load")
 def load_chunks_to_vector_db():
+    from vector_loader import load_to_chroma  # Import deferred
     file_path = "quantumpulse-3000.md"
     chunks = split_markdown_into_chunks(file_path)
 
@@ -38,24 +37,7 @@ def load_chunks_to_vector_db():
         return JSONResponse(status_code=404, content={"error": "Markdown file not found or empty"})
 
     try:
-        # Defer chromadb import to avoid SQLite check on startup
-        from chromadb.client import HttpClient
-        from chromadb.config import Settings
-
-        client = HttpClient(Settings(
-            chroma_api_impl="rest",
-            chroma_server_host="chroma.player1.svc.cluster.local",
-            chroma_server_http_port=8080,
-        ))
-
-        collection = client.get_or_create_collection(name="quantumpulse_chunks")
-
-        collection.add(
-            documents=chunks,
-            ids=[f"chunk-{i}" for i in range(len(chunks))]
-        )
-
+        load_to_chroma(chunks)
         return JSONResponse(content={"status": "success", "chunks_loaded": len(chunks)})
-
     except Exception as e:
         return JSONResponse(status_code=500, content={"status": "error", "details": str(e)})
