@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 import re
 import os
-import chromadb
+from chromadb.client import HttpClient
 from chromadb.config import Settings
 
 app = FastAPI()
@@ -38,17 +38,14 @@ def load_chunks_to_vector_db():
         return JSONResponse(status_code=404, content={"error": "Markdown file not found or empty"})
 
     try:
-        # Connect to the vector DB (Chroma) in-cluster
-        client = chromadb.HttpClient(Settings(
+        client = HttpClient(Settings(
             chroma_api_impl="rest",
             chroma_server_host="chroma.player1.svc.cluster.local",
-            chroma_server_http_port=8080,  # default port, adjust if different
+            chroma_server_http_port=8080,
         ))
 
-        # Create or get a collection
         collection = client.get_or_create_collection(name="quantumpulse_chunks")
 
-        # Add documents to the collection
         collection.add(
             documents=chunks,
             ids=[f"chunk-{i}" for i in range(len(chunks))]
