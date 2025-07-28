@@ -1,3 +1,6 @@
+import os
+os.environ["CHROMA_USE_EMBEDDING_DB"] = "false"
+
 def load_to_chroma(chunks):
     from chromadb.client import HttpClient
     from chromadb.config import Settings
@@ -9,6 +12,7 @@ def load_to_chroma(chunks):
     ))
 
     collection = client.get_or_create_collection(name="quantumpulse_chunks")
+
     collection.add(
         documents=chunks,
         ids=[f"chunk-{i}" for i in range(len(chunks))]
